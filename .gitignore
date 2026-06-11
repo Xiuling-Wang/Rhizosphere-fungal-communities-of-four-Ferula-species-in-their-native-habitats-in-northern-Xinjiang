@@ -1,0 +1,17 @@
+.DS_Store
+.Rhistory
+.RData
+.Rproj.user/
+
+# Raw sequencing reads and large intermediate files
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+analysis/asv_trial/filtered/
+analysis/asv_trial/outputs/*.rds
+
+# Local manuscript files
+*.docx
+*.bak.docx
+~$*
