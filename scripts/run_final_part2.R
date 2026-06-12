@@ -35,6 +35,17 @@ try({
   kw<-do.call(rbind,rows); kw$p_BH<-p.adjust(kw$p,"BH")
   write.table(kw, file.path(tb,"alpha_kruskal_final.tsv"), sep="\t", quote=FALSE, row.names=FALSE)
   cat("Fig3 alpha: any BH<0.05?", any(kw$p_BH<0.05), "\n")
+  ## Friedman repeated-measures test for depth (plant as block; respects nested design)
+  meta$plant <- paste0(as.character(meta$site), meta$replicate)
+  Af <- merge(A, meta[,c("sample","plant")], by="sample")
+  ctab <- table(Af$plant, Af$depth_order); compl <- rownames(ctab)[rowSums(ctab>0)==3]
+  fr <- sapply(mets, function(mm){
+    M <- tapply(Af[[mm]], list(Af$plant, Af$depth_order), function(z) z[1])[compl, , drop=FALSE]
+    friedman.test(M)$p.value })
+  frd <- data.frame(metric=names(fr), Friedman_depth_p=round(unname(fr),4))
+  write.table(frd, file.path(tb,"alpha_friedman_depth_final.tsv"), sep="\t", quote=FALSE, row.names=FALSE)
+  cat("Friedman (depth, plant as block) - any p<0.05?", any(fr<0.05),
+      "| range", sprintf("%.3f-%.3f", min(fr), max(fr)), "\n")
   # plot Shannon + Chao1 by depth x species
   long <- melt(A[,c("sample","species_code","depth_order","Shannon","Chao1")], id=c("sample","species_code","depth_order"))
   p3 <- ggplot(long, aes(depth_order,value,color=species_code))+geom_boxplot(outlier.shape=NA,width=.68)+
@@ -82,9 +93,25 @@ try({
 ############ FIG 5A - dbRDA biplot + PERMANOVA ; 5B - rdacca.hp ############
 bray <- vegdist(rare,"bray")
 try({
-  ad_sd <- adonis2(bray~site*depth_order, data=meta, permutations=999)
-  ad_mg <- adonis2(bray~site+depth_order, data=meta, permutations=999, by="margin")
-  write.table(as.data.frame(ad_mg), file.path(tb,"permanova_final.tsv"), sep="\t", quote=FALSE, col.names=NA)
+  ## Nested design: the three depths are sampled WITHIN each plant.
+  ##  - Species/site -> tested at the PLANT level (depths aggregated; plant = unit of replication, n=12).
+  ##  - Depth        -> tested as a WITHIN-PLANT factor (permutations restricted within plant).
+  library(permute)
+  meta$plant <- factor(paste0(as.character(meta$site), meta$replicate))
+  plant_tab  <- rowsum(as.matrix(rare), group = as.character(meta$plant))
+  meta_plant <- unique(meta[, c("plant","site")])
+  meta_plant <- meta_plant[match(rownames(plant_tab), as.character(meta_plant$plant)), ]
+  ad_site  <- adonis2(vegdist(plant_tab, "bray") ~ site, data = meta_plant, permutations = 9999)
+  ad_depth <- adonis2(bray ~ depth_order, data = meta,
+                      permutations = how(blocks = meta$plant, nperm = 9999))
+  permtab <- data.frame(
+    Df       = c(ad_site$Df[1],       ad_depth$Df[1]),
+    SumOfSqs = c(ad_site$SumOfSqs[1], ad_depth$SumOfSqs[1]),
+    R2       = c(ad_site$R2[1],       ad_depth$R2[1]),
+    F        = c(ad_site$F[1],        ad_depth$F[1]),
+    `Pr(>F)` = c(ad_site$`Pr(>F)`[1], ad_depth$`Pr(>F)`[1]),
+    row.names = c("site","depth_order"), check.names = FALSE)
+  write.table(permtab, file.path(tb,"permanova_final.tsv"), sep="\t", quote=FALSE, col.names=NA)
   # VIF selection
   sel<-env_vars; repeat{ db<-capscale(as.formula(paste("bray~",paste(sel,collapse="+"))),data=envz); v<-vif.cca(db); v<-v[is.finite(v)]
     if(length(v)==0||max(v)<=10||length(sel)<=2)break; sel<-setdiff(sel,names(which.max(v))) }
@@ -93,7 +120,7 @@ try({
   write.table(as.data.frame(trm), file.path(tb,"dbrda_terms_final.tsv"), sep="\t", quote=FALSE, col.names=NA)
   cat(sprintf("Fig5A dbRDA: vars=%s ; R2=%.3f adjR2=%.3f ; PERMANOVA site R2=%.3f p=%.3f depth R2=%.3f p=%.3f\n",
       paste(sel,collapse=","), r2$r.squared, r2$adj.r.squared,
-      ad_mg["site","R2"], ad_mg["site","Pr(>F)"], ad_mg["depth_order","R2"], ad_mg["depth_order","Pr(>F)"]))
+      permtab["site","R2"], permtab["site","Pr(>F)"], permtab["depth_order","R2"], permtab["depth_order","Pr(>F)"]))
   st<-as.data.frame(scores(db,display="sites",choices=1:2)); st$sample<-rownames(st); st<-merge(meta[,c("sample","species_code","depth_order")],st,by="sample")
   bp<-as.data.frame(scores(db,display="bp",choices=1:2)); bp$var<-rownames(bp); sc<-.8*max(abs(st[,c("CAP1","CAP2")]))/max(abs(bp[,1:2]))
   p5a<-ggplot(st,aes(CAP1,CAP2,color=species_code,shape=depth_order))+geom_point(size=2.3)+

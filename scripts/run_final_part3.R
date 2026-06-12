@@ -46,13 +46,20 @@ write.table(sig[,c("genus","enriched","mean_RA","KW_BH","IndVal","primary_lifest
   file.path(tb,"biomarkers_with_fungaltraits.tsv"),sep="\t",quote=FALSE,row.names=FALSE)
 cat("\nBiomarker guilds:\n"); print(sig[,c("genus","enriched","primary_lifestyle")],row.names=FALSE)
 
-## (3) core genera (present in all 4 species)
-pres<-rare>0; setl<-lapply(levels(meta$site),function(s)colnames(pres)[colSums(pres[meta$sample[meta$site==s],,drop=FALSE])>0])
-core<-Reduce(intersect,setl); cg<-tax[core,"Genus"]; cg<-cg[!is.na(cg)&cg!=""]
+## (3) core genera - STRICT prevalence criterion: present in >=50% of samples at EVERY site.
+## (Distinct from the Venn overlap, which counts ASVs merely detected >=1x in all four sites.)
+pres<-rare>0
+prev <- sapply(levels(meta$site), function(s){ idx<-meta$site==s; colSums(pres[idx,,drop=FALSE])/sum(idx) })
+core <- rownames(prev)[apply(prev>=0.5, 1, all)]
+venn_detected <- length(Reduce(intersect, lapply(levels(meta$site),
+  function(s) colnames(pres)[colSums(pres[meta$site==s,,drop=FALSE])>0])))
+cg<-tax[core,"Genus"]; cg<-cg[!is.na(cg)&cg!=""]
+n_unassigned <- length(core) - length(cg)
 coretab<-as.data.frame(sort(table(cg),decreasing=TRUE)); names(coretab)<-c("genus","n_core_ASVs"); coretab$primary_lifestyle<-ft[as.character(coretab$genus)]
 write.table(coretab,file.path(tb,"core_genera.tsv"),sep="\t",quote=FALSE,row.names=FALSE)
-cat(sprintf("\nCore: %d ASVs shared by all 4 species; %d named genera. Top core genera:\n",length(core),nrow(coretab)))
-print(head(coretab,15),row.names=FALSE)
+cat(sprintf("\nStrict core (>=50%% prevalence at every site): %d ASVs; %d named genera (+%d unassigned).\n  (For comparison, %d ASVs are merely detected in all four sites = Venn overlap.)\nCore genera:\n",
+  length(core),nrow(coretab),n_unassigned,venn_detected))
+print(coretab,row.names=FALSE)
 
 ## (4) PERMDISP
 b<-vegdist(rare,"bray"); pd<-lapply(c("site","depth_order"),function(gv){bd<-betadisper(b,factor(meta[[gv]]));a<-anova(bd);data.frame(grouping=gv,F=round(a$`F value`[1],3),p=round(a$`Pr(>F)`[1],3))})
