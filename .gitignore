@@ -2,16 +2,28 @@
 .Rhistory
 .RData
 .Rproj.user/
+.Renviron
+.env
+Rplots.pdf
+outputs/
 
 # Raw sequencing reads and large intermediate files
 *.fastq
 *.fastq.gz
 *.fq
 *.fq.gz
-analysis/asv_trial/filtered/
-analysis/asv_trial/outputs/*.rds
+*.rar
+data/intermediate/
+data/external/
+data/static/
 
 # Local manuscript files
 *.docx
 *.bak.docx
 ~$*
+
+# Local credentials and keys
+*.pem
+*.key
+credentials.*
+secrets.*

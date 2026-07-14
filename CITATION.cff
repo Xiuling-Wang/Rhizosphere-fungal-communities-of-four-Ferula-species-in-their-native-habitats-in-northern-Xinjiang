@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this code or processed dataset, please cite the associated Rhizosphere article."
+title: "Code for rhizosphere fungal communities of four Ferula species"
+type: software
+authors:
+  - family-names: Wang
+    given-names: Xiuling
+  - family-names: Liang
+    given-names: Gaodu
+  - family-names: Zhuang
+    given-names: Li
+repository-code: "https://github.com/Xiuling-Wang/Rhizosphere-fungal-communities-of-four-Ferula-species-in-their-native-habitats-in-northern-Xinjiang"
+date-released: 2026-07-15
+preferred-citation:
+  type: article
+  title: "Rhizosphere fungal communities of four Ferula species in their native habitats in northern Xinjiang"
+  authors:
+    - family-names: Wang
+      given-names: Xiuling
+    - family-names: Liang
+      given-names: Gaodu
+    - family-names: Zhuang
+      given-names: Li
+  journal: Rhizosphere
+  year: 2026

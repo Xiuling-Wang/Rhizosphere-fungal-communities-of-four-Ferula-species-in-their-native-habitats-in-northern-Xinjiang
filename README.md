@@ -1,76 +1,132 @@
-# Rhizosphere fungal communities of four Ferula species
+# Rhizosphere fungal communities of four *Ferula* species
 
-This repository contains the final R scripts used for the revised downstream analysis and figure polishing of the manuscript:
+Publication-code archive for:
 
-**Rhizosphere fungal communities of four Ferula species in their native habitats in northern Xinjiang**
+> Wang X, Liang G, Zhuang L (2026). **Rhizosphere fungal communities of
+> four *Ferula* species in their native habitats in northern Xinjiang.**
+> *Rhizosphere*. Manuscript identifier: RHISPH-D-26-00651R1.
 
-The uploaded scripts correspond to the BLAST-curated fungal ASV workflow used for the revision. Legacy exploratory scripts based on earlier non-final filtering, Mantel tests, Levins niche breadth, and generalist/specialist analyses were intentionally excluded to avoid confusion.
+This release synchronizes the repository with the final accepted analysis and
+the retained publication-figure source. It replaces machine-specific paths and
+revision-stage entry points with portable scripts, frozen processed inputs, and
+release checks. No statistical method or published result was changed during
+this cleanup.
 
-## Workflow
+## Quick start
 
-Run the scripts from a project directory that contains the expected `analysis/`, `tables/`, and `figures/` folders:
+Run from the repository root:
 
 ```bash
-Rscript scripts/run_final.R /path/to/project_root
-Rscript scripts/run_final_part2.R /path/to/project_root
-Rscript scripts/run_final_part3.R /path/to/project_root
-Rscript scripts/polish_figures.R /path/to/project_root
+Rscript scripts/validate_release.R
+Rscript scripts/04_make_publication_figures.R
 ```
 
-If no path is supplied, each script treats the current working directory as the project root.
-
-## Script roles
-
-- `scripts/run_final.R`: builds the BLAST-curated fungal ASV table, rarefies reads, generates Figure 2 components, and calculates genus-level biomarkers using Kruskal-Wallis/BH plus IndVal.
-- `scripts/run_final_part2.R`: reproduces alpha diversity, class heatmap, dbRDA/PERMANOVA, variation partitioning, and genus-soil correlation analyses for Figures 3-5.
-- `scripts/run_final_part3.R`: adds FungalTraits functional annotation, core genera shared by all four Ferula species, and PERMDISP checks.
-- `scripts/polish_figures.R`: creates the final polished publication figures from the final analysis tables.
-
-## Expected inputs
-
-The scripts expect the corrected local analysis outputs to be arranged as follows:
+The figure script writes PDFs to:
 
 ```text
-project_root/
-  analysis/
-    asv_trial/
-      outputs/
-        asv_table_nonchim.tsv
-      taxonomy/
-        fungal_set_BLASTrebuilt.txt
-        asv_taxonomy_fungiBLASTset_UNITE.tsv
-        fungaltraits/
-          polme2020_genera.csv
-    downstream_fungi_final/
-      tables/
-        sample_metadata_downstream.tsv
-  tables/
-    asv_table_fungi_rarefied_3819.tsv
-    sample_metadata_downstream.tsv
-    genus_biomarkers_final.tsv
-    ...
-  figures/
+outputs/figures/
+  components/   # retained component PDFs
+  publication/  # numbered publication PDFs generated from code
 ```
 
-Raw FASTQ files and large intermediate files are not committed here.
+It regenerates Figs. 2–5 and Figs. S1, S3–S5 from the included processed data.
+Fig. 1 and Fig. S2 are static assets and are intentionally not redistributed in
+this sanitized code archive.
 
-## Main revision choices
+## Repository layout
 
-- Used DADA2-style ASV-level downstream tables rather than the older OTU table.
-- Rebuilt the fungal set using BLAST-informed curation because both EUKARYOME and UNITE showed errors near the plant/fungal boundary.
-- Removed confirmed host/plant-derived ASVs before downstream analysis.
-- Retained only assigned fungal phyla for composition summaries.
-- Used UNITE taxonomy for fungal annotation.
-- Used FungalTraits (Polme et al. 2020) for genus-level lifestyle annotation, including arbuscular mycorrhizal fungi, saprotrophs, and plant pathogens.
-- Added core genera and PERMDISP as concise reviewer-response analyses.
+```text
+data/
+  processed/    frozen non-identifying inputs and published result tables
+  README.md     data provenance, exclusions, and optional-input instructions
+scripts/
+  01_prepare_curated_asv.R
+  02_run_community_statistics.R
+  03_run_traits_core_permdisp.R
+  04_make_publication_figures.R
+  05_finalize_supplementary_figures.R
+  validate_release.R
+outputs/        generated locally; ignored by Git
+```
 
-## R packages
+The former filenames (`run_final*.R` and `polish_figures.R`) remain as small
+compatibility entry points so existing links do not break.
 
-The scripts use: `tidyverse`, `vegan`, `cowplot`, `RColorBrewer`, `labdsv`, `VennDiagram`, `ape`, `ggplot2`, `ggrepel`, `pheatmap`, `rdacca.hp`, `reshape2`, `ComplexHeatmap`, `circlize`, `corrplot`, `ggplotify`, `ggsci`, `ggtext`, `png`, and `grid`.
+## Workflow and reproducibility boundary
 
-## References for analysis resources
+1. `01_prepare_curated_asv.R` documents the BLAST-curated ASV filtering,
+   rarefaction, composition summary, and genus-indicator workflow. It requires
+   two non-distributed DADA2/BLAST intermediate files listed in
+   `data/README.md`.
+2. `02_run_community_statistics.R` is runnable from the included processed
+   data. It reproduces alpha-diversity tests, PERMANOVA, dbRDA, hierarchical
+   partitioning, and genus–soil correlations without overwriting the frozen
+   publication tables.
+3. `03_run_traits_core_permdisp.R` documents FungalTraits annotation, core
+   genera, and PERMDISP. It requires the third-party FungalTraits source table;
+   the derived publication tables are included.
+4. `04_make_publication_figures.R` is the canonical final figure script and is
+   runnable from the included processed data. It automatically runs stage 5.
+5. `05_finalize_supplementary_figures.R` applies the later publication layouts
+   for Fig. S1 and Fig. S5 using only frozen processed tables.
 
-- Callahan BJ, McMurdie PJ, Rosen MJ, Han AW, Johnson AJA, Holmes SP. 2016. DADA2: High-resolution sample inference from Illumina amplicon data. *Nature Methods* 13:581-583.
-- Wang Q, Garrity GM, Tiedje JM, Cole JR. 2007. Naive Bayesian classifier for rapid assignment of rRNA sequences into the new bacterial taxonomy. *Applied and Environmental Microbiology* 73:5261-5267.
-- Abarenkov K et al. 2024. UNITE general FASTA release for fungi.
-- Polme S et al. 2020. FungalTraits: a user-friendly traits database of fungi and fungus-like stramenopiles. *Fungal Diversity* 105:1-16.
+The raw-read-to-ASV DADA2 preprocessing workspace was not retained in the final
+local archive. This repository therefore supports a verified processed-data
+rerun and preserves the upstream provenance code, but it does not claim a
+one-command reconstruction from FASTQ files.
+
+Permutation p-values are Monte Carlo estimates. The script resets a documented
+seed immediately before each permutation test, but the last reported digit can
+still vary across R, `vegan`, or `permute` versions. The frozen values used in
+the article remain in `data/processed/`; reruns should preserve effect sizes and
+inferential classifications rather than be expected to reproduce every sampled
+permutation p-value byte-for-byte.
+
+The retained accepted PDFs also received a final export/crop pass whose command
+was not preserved. Regenerated vector PDFs reproduce the plotted data and
+labels, but some page boxes and low-level PDF metadata are therefore not
+expected to be byte-identical to the accepted files.
+
+## Statistical design retained in the code
+
+- Thirty-five rhizosphere samples were retained; planned sample `DGAW3.2` was
+  unavailable.
+- The three depths were sampled within each plant. Species/site was tested at
+  the plant level after aggregating depths, while depth was tested using
+  within-plant restricted permutations.
+- Species and site are confounded in this native-habitat survey. Results are
+  interpreted as species/site associations, not isolated host-species effects.
+- The frozen rarefied table contains 1,397 ASVs at 3,819 reads per sample.
+
+## Data availability
+
+Raw ITS1 reads are publicly available from CNCB-NGDC:
+
+- [GSA CRA015212](https://ngdc.cncb.ac.cn/gsa/browse/CRA015212)
+- [BioProject PRJCA023762](https://ngdc.cncb.ac.cn/bioproject/browse/PRJCA023762)
+
+The repository includes only compact processed inputs and result tables needed
+for code inspection and figure reproduction. Raw reads, exact coordinates,
+author/contact files, manuscripts, submission correspondence, Zotero audit
+logs, provider documents, and local machine paths are excluded.
+
+## R dependencies
+
+The scripts use R plus the following packages where applicable:
+
+`tidyverse`, `vegan`, `permute`, `ape`, `cowplot`, `RColorBrewer`, `labdsv`,
+`VennDiagram`, `futile.logger`, `ggplot2`, `ggrepel`, `pheatmap`, `rdacca.hp`,
+`reshape2`, `ComplexHeatmap`, `circlize`, `corrplot`, `ggplotify`, and `ggtext`.
+
+PDF export uses Cairo and Helvetica. On systems without Helvetica, configure an
+equivalent installed sans-serif font before comparing typography.
+
+## Release validation
+
+`scripts/validate_release.R` checks:
+
+- sample, ASV, taxonomy, and rarefaction dimensions;
+- identifier alignment and absence of the removed raw-file path columns;
+- published PERMANOVA and stringent-core guard values;
+- R syntax for every released script; and
+- local-path, email, private-key, and common GitHub-token patterns.

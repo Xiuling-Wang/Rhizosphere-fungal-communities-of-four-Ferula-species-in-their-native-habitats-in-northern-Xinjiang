@@ -1,0 +1,6 @@
+genus	n_core_ASVs	mean_relative_abundance	primary_lifestyle	core_definition
+Alternaria	1	0.552126585119515	plant_pathogen	Stringent depth-site core
+Cladosporium	1	0.50873452287435	litter_saprotroph	Stringent depth-site core
+Naganishia	1	0.40698761829948	unspecified_saprotroph	Stringent depth-site core
+Pseudogymnoascus	1	1.59054352298657	soil_saprotroph	Stringent depth-site core
+Unclassified	2	11.3522612501403	Unassigned	Stringent depth-site core

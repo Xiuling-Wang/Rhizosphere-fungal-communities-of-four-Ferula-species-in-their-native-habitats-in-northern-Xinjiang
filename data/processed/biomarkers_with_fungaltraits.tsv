@@ -1,0 +1,19 @@
+genus	enriched	mean_RA	KW_BH	IndVal	primary_lifestyle	secondary_lifestyle
+Aspergillus	HD	5.431	0.0117421334573022	0.57	unspecified_saprotroph	foliar_endophyte
+Phialophora	DG	0.11	0.0172748126994749	0.795	litter_saprotroph	plant_pathogen
+Ceratobasidium	HD	3.314	0.0185367722539882	0.511	plant_pathogen	litter_saprotroph
+Neocamarosporium	DG	0.883	0.0241846458676481	0.71	wood_saprotroph	plant_pathogen
+Neosetophoma	DG	0.185	0.0242295469089362	0.543	litter_saprotroph	foliar_endophyte
+Tricharina	DG	0.322	0.028451969256442	0.621	soil_saprotroph	foliar_endophyte
+Funneliformis	DG	0.159	0.0410201302324668	0.715	arbuscular_mycorrhizal	root-associated
+Marcelleina	HD	0.314	0.0587298213651411	0.648	ectomycorrhizal	
+Penicillium	HD	1.642	0.0587298213651411	0.762	unspecified_saprotroph	foliar_endophyte
+Dematiopleospora	DG	0.291	0.0608482940454035	0.759	litter_saprotroph	wood_saprotroph
+Glomus	DG	0.107	0.0630393167211154	0.66	arbuscular_mycorrhizal	root-associated
+Lophiostoma	DG	0.116	0.0765543737264771	0.609	wood_saprotroph	litter_saprotroph
+Aureobasidium	DG	1.788	0.0905019248663798	0.738	sooty_mold	litter_saprotroph
+Dominikia	DG	0.75	0.0905019248663798	0.756	arbuscular_mycorrhizal	root-associated
+Psathyrella	XJ	0.438	0.0905019248663798	0.75	wood_saprotroph	litter_saprotroph
+Trichophaeopsis	DG	0.422	0.0905019248663798	0.719	litter_saprotroph	foliar_endophyte
+Didymella	DG	0.147	0.110591845892335	0.625	plant_pathogen	litter_saprotroph
+Comoclathris	DG	1.774	0.144962121740673	0.727	wood_saprotroph	
