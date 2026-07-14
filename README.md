@@ -4,7 +4,8 @@ Publication-code archive for:
 
 > Wang X, Liang G, Zhuang L (2026). **Rhizosphere fungal communities of
 > four *Ferula* species in their native habitats in northern Xinjiang.**
-> *Rhizosphere*. Manuscript identifier: RHISPH-D-26-00651R1.
+> *Rhizosphere*, 101421.
+> https://doi.org/10.1016/j.rhisph.2026.101421
 
 This release synchronizes the repository with the final accepted analysis and
 the retained publication-figure source. It replaces machine-specific paths and
